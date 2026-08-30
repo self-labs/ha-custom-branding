@@ -1,0 +1,65 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Custom Branding",
+        "description": "Coloque os ícones numa pasta dentro do diretório de configuração do Home Assistant (por exemplo {default_dir}, que vira /config/{default_dir}). Os nomes dos arquivos precisam ser os mesmos que o Home Assistant usa: favicon.ico, favicon-192x192.png, favicon-512x512.png, maskable_icon-512x512.png, logo-loading.svg, e assim por diante. A lista completa está no README.",
+        "data": {
+          "brand_name": "Nome da marca",
+          "assets_dir": "Pasta dos arquivos",
+          "patch_html": "Reescrever o título da tela de login"
+        },
+        "data_description": {
+          "brand_name": "Substitui \"Home Assistant\" na aba do navegador e no nome do app instalado.",
+          "assets_dir": "Caminho relativo ao diretório de configuração. Mantenha fora de custom_components, que o HACS substitui a cada atualização.",
+          "patch_html": "Desligado por padrão. As telas de login e de onboarding não têm ponto de extensão, então o título só muda reescrevendo arquivos dentro do pacote do frontend. A integração guarda um backup e reaplica a cada boot, então a mudança sobrevive ao update da imagem."
+        }
+      }
+    },
+    "error": {
+      "empty_name": "O nome da marca não pode ficar vazio.",
+      "empty_dir": "A pasta dos arquivos não pode ficar vazia.",
+      "unsafe_dir": "O caminho não pode conter \"..\".",
+      "dir_not_found": "Pasta não encontrada dentro do diretório de configuração.",
+      "no_assets": "Nenhum arquivo reconhecido nessa pasta. Os nomes precisam ser os mesmos que o Home Assistant usa, como favicon.ico ou favicon-512x512.png."
+    },
+    "abort": {
+      "single_instance_allowed": "O Custom Branding já está configurado."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Custom Branding",
+        "description": "Mudar qualquer coisa aqui recarrega a integração. Trocar um ícone no disco mantendo o mesmo nome de arquivo só precisa da ação custom_branding.apply.",
+        "data": {
+          "brand_name": "Nome da marca",
+          "assets_dir": "Pasta dos arquivos",
+          "patch_html": "Reescrever o título da tela de login"
+        },
+        "data_description": {
+          "brand_name": "Substitui \"Home Assistant\" na aba do navegador e no nome do app instalado.",
+          "assets_dir": "Caminho relativo ao diretório de configuração.",
+          "patch_html": "Desligar restaura as páginas originais."
+        }
+      }
+    },
+    "error": {
+      "empty_name": "O nome da marca não pode ficar vazio.",
+      "empty_dir": "A pasta dos arquivos não pode ficar vazia.",
+      "unsafe_dir": "O caminho não pode conter \"..\".",
+      "dir_not_found": "Pasta não encontrada dentro do diretório de configuração.",
+      "no_assets": "Nenhum arquivo reconhecido nessa pasta."
+    }
+  },
+  "services": {
+    "apply": {
+      "name": "Aplicar identidade visual",
+      "description": "Relê a pasta de arquivos e aplica a identidade visual de novo."
+    },
+    "restore": {
+      "name": "Restaurar páginas originais",
+      "description": "Desfaz a reescrita das telas de login e de onboarding."
+    }
+  }
+}
