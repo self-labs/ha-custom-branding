@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Custom Branding",
-        "description": "Put your icons in a folder inside the Home Assistant configuration directory (for example {default_dir}, which becomes /config/{default_dir}). File names must match the ones Home Assistant uses: favicon.ico, favicon-192x192.png, favicon-512x512.png, maskable_icon-512x512.png, logo-loading.svg, and so on. See the README for the full list.",
+        "description": "Put your icons in a folder inside the Home Assistant configuration directory (for example {default_dir}, which becomes /config/{default_dir}). File names must match the ones Home Assistant uses: favicon.ico, favicon-192x192.png, favicon-512x512.png, maskable_icon-512x512.png, logo-loading.svg, and so on. See the README for the full list.\n\n⚠️ Home Assistant and its logo are trademarks of the Open Home Foundation, and the Apache 2.0 licence does not grant rights over them. Rebranding an install you operate is a local change. Delivering it as your own product, with the origin removed, is not: tell the client what runs underneath. See the README.",
         "data": {
           "brand_name": "Brand name",
           "assets_dir": "Asset folder",

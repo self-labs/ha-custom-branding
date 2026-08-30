@@ -102,11 +102,11 @@ Three of these are drawn straight onto the Home Assistant background, which is `
 
 The `CDATA` is not optional: an SVG served as `image/svg+xml` is parsed as strict XML, so a bare `<` or `&` anywhere in that CSS breaks the whole file.
 
-| Slot | Rendered at | Theme-aware how |
-| :--- | :--- | :--- |
-| Login and onboarding | 56x56 square | `login-icon.svg`, media query inside the file |
-| Loading screen | 96x96 square | `logo-loading.svg`, media query inside the file |
-| Footer | 237x24 | Two files: Home Assistant picks with `picture` + `prefers-color-scheme` |
+| Slot                 | Rendered at  | Theme-aware how                                                         |
+| :------------------- | :----------- | :---------------------------------------------------------------------- |
+| Login and onboarding | 56x56 square | `login-icon.svg`, media query inside the file                           |
+| Loading screen       | 96x96 square | `logo-loading.svg`, media query inside the file                         |
+| Footer               | 237x24       | Two files: Home Assistant picks with `picture` + `prefers-color-scheme` |
 
 **`login-icon.svg` is the odd one.** That slot is a PNG in the frontend markup, and a PNG cannot carry a media query. aiohttp picks the `Content-Type` from the file on disk rather than from the URL, so when this file exists the integration serves it at `/static/icons/favicon-192x192.png` and the browser receives `image/svg+xml` and renders it as SVG. The PWA manifest keeps pointing at the real PNG, since an app icon has to be a bitmap.
 
@@ -181,9 +181,46 @@ Turning the option off, or calling `custom_branding.restore`, puts the originals
 > [!NOTE]
 > Adding a file that was **not** there when Home Assistant started still needs a restart: aiohttp has no public API to add a route after the fact without conflicts. Replacing a file that already exists takes effect immediately.
 
-## Trademark
+## Trademark and responsible use
 
-The Home Assistant name and logo, and the Open Home Foundation marks, belong to their owners. Replacing the artwork on an installation you operate is a local change; **redistributing** a modified Home Assistant under a different name is a separate question, governed by their trademark policy. Check it before shipping a rebranded product.
+**Read this before pointing the integration at a client's machine.**
+
+This is not legal advice, and I am not a lawyer. What follows is what the primary sources actually say, so you can make your own call.
+
+### What the sources say
+
+The Home Assistant logo is trademarked and owned by the Open Home Foundation. Their own wording, from [`home-assistant/assets`](https://github.com/home-assistant/assets/blob/master/logo/README.md):
+
+> This logo is trademarked and the property of the Open Home Foundation. This means it is not available for commercial use without express written permission from the foundation. We regard commercial use as anything designed to market or promote a product, software or service that is for sale.
+
+`HOME ASSISTANT` is also a registered trademark of the foundation ([USPTO serial 79432098](https://trademarks.justia.com/794/32/home-79432098.html)).
+
+And the Apache License 2.0, which Home Assistant is released under, is explicit that the licence does not carry trademark rights with it. Section 6:
+
+> This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Work.
+
+So: the code is free to modify and redistribute, **the name and the logo are not**.
+
+### Where this integration sits
+
+It does not use their marks. It does the opposite: it takes them off the screen and puts yours there. That avoids one problem and creates another, because the software underneath is still Home Assistant.
+
+| Situation                                                                       | Where it stands                                                                                                                        |
+| :------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------- |
+| Your own install, your own logo                                                 | A local change to software you run. Nobody is being told anything                                                                      |
+| An install you set up for a client, who knows it is Home Assistant              | Fine, and the honest default                                                                                                           |
+| Sold or delivered as **your** product, with the origin removed                  | This is the one to be careful about. The foundation defines commercial use as anything promoting a product or service that is for sale |
+| Implying you are affiliated with, endorsed by, or partnered with the foundation | Never do this                                                                                                                          |
+
+### The practical rule
+
+**Rebranding the interface is not the same as claiming authorship.** Tell the client what runs underneath. Keep Home Assistant named in your proposal, your invoice, your support documentation and your handover. What you are selling is the integration work, the hardware and the support, not the software.
+
+If you are building a product around it, talk to them first: `partner@openhomefoundation.org`.
+
+### And the community
+
+Home Assistant is built by volunteers and funded partly by people who know it exists. Stripping the name off an install and letting the client believe you wrote it takes from that, whatever the legal reading turns out to be.
 
 ## Compatibility
 
