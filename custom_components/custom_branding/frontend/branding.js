@@ -39,11 +39,25 @@ const applyMeta = () => {
     .forEach((el) => el.remove());
 };
 
+// Remember the title we wrote ourselves, read back from the DOM.
+let lastApplied = null;
+
 const applyTitle = () => {
   const current = document.title;
-  if (!current || !current.includes(HA_NAME)) return;
+  // Bail on the title we just wrote. When BRAND contains HA_NAME (say "My Home
+  // Assistant"), re-applying the swap appends the prefix again on every pass,
+  // and the MutationObserver below spins forever: the callbacks are microtasks,
+  // so the loop never yields to the event loop, the tab freezes and the string
+  // grows without bound.
+  if (!current || current === lastApplied || !current.includes(HA_NAME)) return;
   const next = current.split(HA_NAME).join(BRAND);
-  if (next !== current) document.title = next;
+  if (next === current) return;
+  document.title = next;
+  // Read back instead of storing `next`: the document.title getter trims the
+  // ends and collapses runs of ASCII whitespace, so a BRAND with a double space
+  // inside would never compare equal on the next pass and the loop would
+  // return.
+  lastApplied = document.title;
 };
 
 if (BRAND !== HA_NAME) {

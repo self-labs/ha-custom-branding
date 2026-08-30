@@ -8,6 +8,63 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 
 ## [Unreleased]
 
+## [2026.8.3] - 2026-08-30
+
+An adversarial review of the Python (four independent lenses, every finding
+re-checked against the core source before being accepted) turned up seven real
+defects. Six of the seven are silent: the entry reports success while the
+integration serves the wrong thing or leaves state behind.
+
+### ✨ Added
+
+- **`translations/pt.json`.** Home Assistant does not fall back between language
+  variants, so an install set to `pt` was getting English instead of the `pt-BR`
+  strings. Same wording for now; split the files if the two ever diverge.
+
+### 🔧 Changed
+
+- **Minimum Home Assistant is now 2024.12, was 2024.7.** Two independent floors
+  apply and the higher one wins: `async_register_static_paths` (2024.7) and the
+  framework-provided `OptionsFlow.config_entry` property (2024.12). On 2024.11
+  and older the base class has no `config_entry` at all, so opening **Configure**
+  raised `AttributeError` on exactly the versions HACS was letting install.
+- **README badge:** the HACS one used a logo slug that did not render in the HACS
+  panel. It now uses the same slug as the badge next to it.
+
+### 🐛 Fixed
+
+- **Changing the asset folder kept serving the old one, silently.** The route
+  guard was a set of URLs, so a second setup found every URL already present,
+  registered nothing, and logged nothing, while the core had frozen the old path
+  into a `functools.partial` at registration time. Deleting the old folder then
+  404'd all 19 icons **without falling back** to the Home Assistant originals,
+  because the per-file route still wins by longest prefix. The guard now maps
+  URL to path and raises `ConfigEntryError` asking for a restart, which is the
+  only thing that can actually rebind a route.
+- **`restore` running against `apply` could destroy a backup.** Both land on the
+  executor thread pool and the restore action does not go through the config
+  entry lock, so one thread could delete the backup another had just recreated,
+  leaving a marked file that `_patch_one` refuses to touch and `restore_titles`
+  skips forever: the original page unrecoverable without a `docker pull`. Both
+  functions now hold a module lock, and the temp file carries the thread id.
+- **The tab froze when the brand name contained "Home Assistant".** `applyTitle`
+  replaced the product name on every pass, so a brand like "My Home Assistant"
+  grew the title on each run and the `MutationObserver` re-fired. The callbacks
+  are microtasks, so the loop never yielded to the event loop. It now remembers
+  the title it wrote, read back from the DOM.
+- **The HTML patch was only undone when the in-memory list was populated.** The
+  patch is on-disk state that outlives the process, and that list is empty on
+  any boot where setup raised before layer 3. The unload now always tries the
+  restore, and `async_remove_entry` was added so deleting an entry that never
+  reached LOADED still reverts the files inside the container.
+- **The PWA manifest was never reverted.** Unloading the integration left the
+  brand name and icons in `/manifest.json`, and `if icons:` let the icons of a
+  previous asset folder survive a reload. The core values are now snapshotted
+  before the first overwrite and restored on unload.
+- **`HomeAssistantError` reached the UI as a bare traceback.** Setup failures now
+  raise `ConfigEntryError`, so the reason shows up in Devices and Services
+  instead of only in the log. `OSError` from scanning the folder is handled too.
+
 ## [2026.8.2] - 2026-08-30
 
 ### 🔧 Changed
@@ -53,6 +110,7 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 - Actions `custom_branding.apply` and `custom_branding.restore`.
 - CI with `hassfest` and `hacs/action`.
 
-[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.2...HEAD
+[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.3...HEAD
+[2026.8.3]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.2...v2026.8.3
 [2026.8.2]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.1...v2026.8.2
 [2026.8.1]: https://github.com/self-labs/ha-custom-branding/releases/tag/v2026.8.1

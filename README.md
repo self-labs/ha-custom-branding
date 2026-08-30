@@ -1,4 +1,4 @@
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5?logo=homeassistantcommunitystore&logoColor=white)](https://hacs.xyz/) [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.7%2B-41BDF5?logo=home-assistant&logoColor=white)](https://www.home-assistant.io/) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5?logo=home-assistant&logoColor=white)](https://hacs.xyz/) [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.12%2B-41BDF5?logo=home-assistant&logoColor=white)](https://www.home-assistant.io/) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
 # 🎨 Custom Branding
 
@@ -158,7 +158,7 @@ The Home Assistant name and logo, and the Open Home Foundation marks, belong to 
 
 ## Compatibility
 
-Requires **Home Assistant 2024.7 or newer** (`async_register_static_paths`, introduced in 2024.7, replaced the older blocking `register_static_path`).
+Requires **Home Assistant 2024.12 or newer**. Two independent floors: `async_register_static_paths` (2024.7, which replaced the older blocking `register_static_path`) and the framework-provided `OptionsFlow.config_entry` property (2024.12), which is what lets the options flow have an empty constructor. The higher of the two wins.
 
 Tested against the interfaces of the 2026.x frontend. If a future release renames the icon files, the integration logs a warning and leaves the originals in place rather than serving something broken.
 

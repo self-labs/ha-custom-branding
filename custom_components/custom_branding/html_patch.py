@@ -21,11 +21,21 @@ import gzip
 import html
 import logging
 import os
+import threading
 from pathlib import Path
 
 from .const import BACKUP_SUFFIX, HA_TITLE, PATCH_MARKER, PATCHED_HTML
 
 _LOGGER = logging.getLogger(__name__)
+
+# patch_titles and restore_titles are dispatched through
+# hass.async_add_executor_job, which lands on a 64 thread pool. The restore
+# action does not go through the config entry setup lock, so it can run while a
+# reload triggered by apply is patching the very same files. Interleaved, one
+# thread deletes a backup the other just recreated, leaving a marked file that
+# _patch_one refuses to touch and restore_titles skips forever. A threading lock
+# rather than an asyncio one, so the guarantee holds regardless of who calls.
+_LOCK = threading.Lock()
 
 
 def patch_titles(root: Path, brand_name: str) -> list[str]:
@@ -34,31 +44,33 @@ def patch_titles(root: Path, brand_name: str) -> list[str]:
     Returns the names of the files actually rewritten.
     """
     patched: list[str] = []
-    for name in PATCHED_HTML:
-        try:
-            if _patch_one(root / name, brand_name):
-                patched.append(name)
-        except OSError as err:
-            _LOGGER.error("Could not rewrite %s: %s", root / name, err)
+    with _LOCK:
+        for name in PATCHED_HTML:
+            try:
+                if _patch_one(root / name, brand_name):
+                    patched.append(name)
+            except OSError as err:
+                _LOGGER.error("Could not rewrite %s: %s", root / name, err)
     return patched
 
 
 def restore_titles(root: Path) -> list[str]:
     """Put the original HTML back from the sidecar backups."""
     restored: list[str] = []
-    for name in PATCHED_HTML:
-        target = root / name
-        backup = target.with_name(target.name + BACKUP_SUFFIX)
-        if not backup.is_file():
-            continue
-        try:
-            data = backup.read_bytes()
-            _atomic_write(target, data)
-            _refresh_sidecars(target, data)
-            backup.unlink()
-            restored.append(name)
-        except OSError as err:
-            _LOGGER.error("Could not restore %s: %s", target, err)
+    with _LOCK:
+        for name in PATCHED_HTML:
+            target = root / name
+            backup = target.with_name(target.name + BACKUP_SUFFIX)
+            if not backup.is_file():
+                continue
+            try:
+                data = backup.read_bytes()
+                _atomic_write(target, data)
+                _refresh_sidecars(target, data)
+                backup.unlink()
+                restored.append(name)
+            except OSError as err:
+                _LOGGER.error("Could not restore %s: %s", target, err)
     return restored
 
 
@@ -127,7 +139,15 @@ def _refresh_sidecars(target: Path, data: bytes) -> None:
 
 
 def _atomic_write(target: Path, data: bytes) -> None:
-    """Write through a temp file in the same directory, then rename."""
-    tmp = target.with_name(f"{target.name}.custom_branding-tmp")
-    tmp.write_bytes(data)
-    os.replace(tmp, target)
+    """Write through a temp file in the same directory, then rename.
+
+    The temp name carries the thread id: a fixed name is shared by every writer
+    of the same target, so one thread could rename bytes another was still
+    writing. It also keeps a leftover from an earlier crash out of the way.
+    """
+    tmp = target.with_name(f"{target.name}.{threading.get_ident()}.custom_branding-tmp")
+    try:
+        tmp.write_bytes(data)
+        os.replace(tmp, target)
+    finally:
+        tmp.unlink(missing_ok=True)

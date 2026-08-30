@@ -73,3 +73,18 @@ SERVICE_RESTORE: Final = "restore"
 
 DATA_UNDO_JS: Final = "undo_js"
 DATA_PATCHED: Final = "patched_html"
+DATA_ROUTES: Final = "routes"
+DATA_MANIFEST_SNAPSHOT: Final = "manifest_snapshot"
+
+# Every key _apply_manifest writes. All seven exist in the core default manifest,
+# so restoring from a snapshot leaves nothing behind. theme_color is deliberately
+# absent: the core theme handler rewrites that one on its own.
+MANIFEST_KEYS: Final = (
+    "icons",
+    "name",
+    "short_name",
+    "description",
+    "screenshots",
+    "prefer_related_applications",
+    "related_applications",
+)

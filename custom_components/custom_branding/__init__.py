@@ -20,6 +20,7 @@ Three layers, in order of how invasive they are:
 from __future__ import annotations
 
 import logging
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
@@ -30,7 +31,7 @@ from homeassistant.components import frontend
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall, callback
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import ConfigEntryError, HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
@@ -41,13 +42,16 @@ from .const import (
     CONF_ASSETS_DIR,
     CONF_BRAND_NAME,
     CONF_PATCH_HTML,
+    DATA_MANIFEST_SNAPSHOT,
     DATA_PATCHED,
+    DATA_ROUTES,
     DATA_UNDO_JS,
     DEFAULT_ASSETS_DIR,
     DEFAULT_BRAND_NAME,
     DOMAIN,
     JS_URL,
     MANIFEST_ANY_SIZES,
+    MANIFEST_KEYS,
     MANIFEST_MASKABLE_SIZES,
     MODULE_URL,
     SERVICE_APPLY,
@@ -75,8 +79,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     async def _handle_restore(call: ServiceCall) -> None:
         """Undo the HTML patch, putting the original pages back."""
-        root = await hass.async_add_executor_job(_frontend_root)
-        restored = await hass.async_add_executor_job(html_patch.restore_titles, root)
+        restored = await _async_restore_html(hass)
         _LOGGER.info("Restored %d original page(s): %s", len(restored), restored)
 
     hass.services.async_register(DOMAIN, SERVICE_APPLY, _handle_apply, vol.Schema({}))
@@ -94,11 +97,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.config.path(options.get(CONF_ASSETS_DIR) or DEFAULT_ASSETS_DIR)
     )
 
-    present = await hass.async_add_executor_job(_scan_assets, assets_dir)
+    try:
+        present = await hass.async_add_executor_job(_scan_assets, assets_dir)
+    except OSError as err:
+        raise ConfigEntryError(f"Could not read {assets_dir}: {err}") from err
     if present is None:
-        raise HomeAssistantError(
-            f"Asset folder not found: {assets_dir}. Create it and put your "
-            f"icons there, then reload the integration."
+        raise ConfigEntryError(
+            f"Asset folder not found: {assets_dir}. Create it, put your icons "
+            f"there, then reload the integration."
         )
 
     known = set(ASSET_ROUTES)
@@ -114,41 +120,62 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # --- Layer 1: one route per file -------------------------------------
     #
-    # Registering the same URL twice raises (or is silently ignored, depending
-    # on what else got registered in between), and there is no public API to
-    # remove a route. So this runs once per Home Assistant start; reloading the
-    # entry re-applies everything else but keeps the routes already in place.
-    registered: set[str] = hass.data.setdefault(DOMAIN, {}).setdefault("routes", set())
-    configs: list[StaticPathConfig] = []
+    # The core freezes the on-disk path into a functools.partial at registration
+    # time, and aiohttp resolves same-path resources in registration order, so a
+    # second route for an URL already taken can never be reached. Registration
+    # is therefore once per Home Assistant start, and a folder change has to be
+    # reported rather than swallowed: otherwise the entry reloads "successfully"
+    # while every icon still resolves to the previous folder, and once that
+    # folder is deleted they all 404 with no way back to the original artwork.
+    domain_data: dict[str, Any] = hass.data.setdefault(DOMAIN, {})
+    # url -> path actually registered during THIS Home Assistant boot.
+    registered: dict[str, str] = domain_data.setdefault(DATA_ROUTES, {})
 
-    if ASSETS_URL not in registered:
-        configs.append(StaticPathConfig(ASSETS_URL, str(assets_dir), False))
-        registered.add(ASSETS_URL)
-    if MODULE_URL not in registered:
-        configs.append(
-            StaticPathConfig(MODULE_URL, str(Path(__file__).parent / "frontend"), False)
-        )
-        registered.add(MODULE_URL)
-
+    wanted: dict[str, str] = {
+        ASSETS_URL: str(assets_dir),
+        MODULE_URL: str(Path(__file__).parent / "frontend"),
+    }
     for filename in sorted(usable):
-        url = ASSET_ROUTES[filename]
-        if url in registered:
-            continue
-        configs.append(StaticPathConfig(url, str(assets_dir / filename), True))
-        registered.add(url)
+        wanted[ASSET_ROUTES[filename]] = str(assets_dir / filename)
 
+    if stale := {
+        url: registered[url]
+        for url, path in wanted.items()
+        if url in registered and registered[url] != path
+    }:
+        raise ConfigEntryError(
+            "The asset folder changed, but aiohttp cannot replace a route while "
+            f"Home Assistant is running. Restart Home Assistant to serve "
+            f"{assets_dir}. Still stuck on: {stale}"
+        )
+
+    configs = [
+        StaticPathConfig(url, path, url not in (ASSETS_URL, MODULE_URL))
+        for url, path in wanted.items()
+        if url not in registered
+    ]
     if configs:
         await hass.http.async_register_static_paths(configs)
+        # Only after the await: a failed registration must not leave the map
+        # claiming the route exists.
+        registered.update(wanted)
         _LOGGER.info("Serving %d branded asset(s) from %s", len(usable), assets_dir)
 
     # --- Layer 2: PWA manifest and the tab title -------------------------
+    #
+    # Snapshot once per Home Assistant start, before the first overwrite, so
+    # unload can put the core values back. MANIFEST_JSON is a module singleton
+    # and update_key replaces the whole key.
+    if DATA_MANIFEST_SNAPSHOT not in domain_data:
+        domain_data[DATA_MANIFEST_SNAPSHOT] = _snapshot_manifest()
     _apply_manifest(usable, brand_name)
+
     # The brand name travels in the query string so the module needs no build
     # step. Keep the exact URL around: remove_extra_js_url matches by string,
     # and the core stores these in a frozenset.
     js_url = f"{JS_URL}?brand={quote(brand_name, safe='')}"
     frontend.add_extra_js_url(hass, js_url)
-    hass.data[DOMAIN][DATA_UNDO_JS] = js_url
+    domain_data[DATA_UNDO_JS] = js_url
 
     # --- Layer 3: opt-in HTML patch --------------------------------------
     if options.get(CONF_PATCH_HTML):
@@ -156,7 +183,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         patched = await hass.async_add_executor_job(
             html_patch.patch_titles, root, brand_name
         )
-        hass.data[DOMAIN][DATA_PATCHED] = patched
+        domain_data[DATA_PATCHED] = patched
         if patched:
             _LOGGER.info("Rewrote the title in: %s", ", ".join(patched))
 
@@ -171,18 +198,48 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     tearing one out through private attributes is not worth the risk. They only
     serve files, and a restart clears them.
     """
-    if js_url := hass.data.get(DOMAIN, {}).pop(DATA_UNDO_JS, None):
+    domain_data: dict[str, Any] = hass.data.setdefault(DOMAIN, {})
+
+    if js_url := domain_data.pop(DATA_UNDO_JS, None):
         frontend.remove_extra_js_url(hass, js_url)
 
-    if hass.data.get(DOMAIN, {}).get(DATA_PATCHED):
-        root = await hass.async_add_executor_job(_frontend_root)
-        await hass.async_add_executor_job(html_patch.restore_titles, root)
-        hass.data[DOMAIN][DATA_PATCHED] = []
+    _restore_manifest(domain_data.pop(DATA_MANIFEST_SNAPSHOT, None))
+
+    # No guard on DATA_PATCHED: the patch is on-disk state that outlives the
+    # process, and that key is empty on any boot where setup raised before
+    # layer 3, or where patch_titles returned [] after already writing a backup.
+    # restore_titles is a no-op when there is no backup, so calling it is safe.
+    if restored := await _async_restore_html(hass):
+        _LOGGER.info("Restored %d original page(s): %s", len(restored), restored)
+    domain_data.pop(DATA_PATCHED, None)
 
     _LOGGER.info(
         "Custom Branding unloaded. The asset routes stay until Home Assistant restarts"
     )
     return True
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Clean the frontend package even when the entry never reached LOADED.
+
+    The core calls this on ConfigEntry.async_remove regardless of entry state,
+    unlike async_unload_entry, which returns early for anything but LOADED. So
+    a setup that failed mid-way still gets its on-disk changes reverted.
+    """
+    if restored := await _async_restore_html(hass):
+        _LOGGER.info(
+            "Restored %d original page(s) on removal: %s", len(restored), restored
+        )
+
+
+async def _async_restore_html(hass: HomeAssistant) -> list[str]:
+    """Put the original pages back. Safe to call unconditionally."""
+    try:
+        root = await hass.async_add_executor_job(_frontend_root)
+        return await hass.async_add_executor_job(html_patch.restore_titles, root)
+    except Exception:  # noqa: BLE001
+        _LOGGER.exception("Could not restore the original frontend pages")
+        return []
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -209,6 +266,34 @@ def _frontend_root() -> Path:
 
 
 @callback
+def _snapshot_manifest() -> dict[str, Any]:
+    """Copy the frontend's original values once, before overwriting them.
+
+    There is no public read API for the manifest, hence the defensive getattr:
+    if the core ever renames this, the integration loses the restore instead of
+    failing setup.
+    """
+    manifest = getattr(frontend, "MANIFEST_JSON", None)
+    current = getattr(manifest, "manifest", None)
+    if not isinstance(current, dict):
+        _LOGGER.warning(
+            "Could not read the frontend manifest: the PWA keys will only go "
+            "back to their defaults after a Home Assistant restart"
+        )
+        return {}
+    return {key: deepcopy(current[key]) for key in MANIFEST_KEYS if key in current}
+
+
+@callback
+def _restore_manifest(snapshot: dict[str, Any] | None) -> None:
+    """Put the core PWA values back."""
+    if not snapshot:
+        return
+    for key, value in snapshot.items():
+        frontend.add_manifest_json_key(key, value)
+
+
+@callback
 def _apply_manifest(present: set[str], brand_name: str) -> None:
     """Rewrite the PWA name and icons, keeping both purposes."""
     icons: list[dict[str, str]] = []
@@ -221,15 +306,21 @@ def _apply_manifest(present: set[str], brand_name: str) -> None:
         if name in present:
             icons.append(_icon(name, size, "maskable"))
 
-    if icons:
+    if not icons:
+        # Writing an empty list would be worse than leaving the core icons, but
+        # so is keeping the icons of a PREVIOUS asset folder after a reload, so
+        # this branch is loud.
+        _LOGGER.warning(
+            "No manifest icon found: the installed app keeps whatever icons are "
+            "currently set, which may belong to an earlier configuration"
+        )
+    else:
         if not any(icon["purpose"] == "maskable" for icon in icons):
             _LOGGER.warning(
                 "No maskable_icon-*.png found: Android will fall back to a "
                 "cropped version of the regular icon"
             )
         frontend.add_manifest_json_key("icons", icons)
-    else:
-        _LOGGER.warning("No manifest icon found, keeping the Home Assistant ones")
 
     frontend.add_manifest_json_key("name", brand_name)
     frontend.add_manifest_json_key("short_name", brand_name)

@@ -115,9 +115,11 @@ class CustomBrandingConfigFlow(ConfigFlow, domain=DOMAIN):
 class CustomBrandingOptionsFlow(OptionsFlow):
     """Edit the settings after setup.
 
-    Note the empty constructor: assigning `self.config_entry` was deprecated in
-    2024.12 and the setter was removed in 2025.12. The base class exposes
-    `self.config_entry` as a read-only property.
+    Note the empty constructor: `OptionsFlow` only exposes `config_entry` as a
+    read-only property from 2024.12 onwards, the release that also deprecated
+    assigning it (the setter was removed in 2025.12). That is why the HACS floor
+    is 2024.12 and not 2024.7: on 2024.11 and older the base class has no
+    `config_entry` at all and `async_step_init` would raise AttributeError.
     """
 
     async def async_step_init(
