@@ -8,6 +8,24 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 
 ## [Unreleased]
 
+## [2026.8.2] - 2026-08-30
+
+### 🔧 Changed
+
+- **`manifest.json`:** keys reordered to `domain`, `name`, then alphabetical, which is what
+  `hassfest` requires. The CI failed without it.
+
+### 🐛 Fixed
+
+- **`NameError: name 'DATA_UNDO_JS' is not defined` when setting up the integration.** The constant
+  lived in `const.py` but was missing from the import list in `__init__.py`, so `async_setup_entry`
+  died on the line right after registering the JS module.
+
+  The failure was **partial and misleading**: the static routes, the PWA manifest and the JS module
+  had all been applied before the line that raised, so the icons did change and `/manifest.json`
+  already carried the brand name, while the entry showed up as failed under Devices and Services
+  and the login page title rewrite never ran at all.
+
 ## [2026.8.1] - 2026-08-30
 
 ### ✨ Added
@@ -35,5 +53,6 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 - Actions `custom_branding.apply` and `custom_branding.restore`.
 - CI with `hassfest` and `hacs/action`.
 
-[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.1...HEAD
+[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.2...HEAD
+[2026.8.2]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.1...v2026.8.2
 [2026.8.1]: https://github.com/self-labs/ha-custom-branding/releases/tag/v2026.8.1

@@ -42,6 +42,7 @@ from .const import (
     CONF_BRAND_NAME,
     CONF_PATCH_HTML,
     DATA_PATCHED,
+    DATA_UNDO_JS,
     DEFAULT_ASSETS_DIR,
     DEFAULT_BRAND_NAME,
     DOMAIN,
