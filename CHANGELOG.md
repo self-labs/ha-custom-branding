@@ -12,12 +12,26 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 
 ### ✨ Added
 
+- **Trademark and responsible use section**, built on the primary sources rather
+  than on impressions: the Open Home Foundation's own wording in
+  `home-assistant/assets` ("not available for commercial use without express
+  written permission"), the `HOME ASSISTANT` registration, and section 6 of the
+  Apache 2.0 licence, which excludes trademark rights from what the licence
+  grants.
+
+  The point it makes: this integration does not use their marks, it removes
+  them, and the software underneath is still Home Assistant. Rebranding an
+  install you operate is a local change; delivering it as your own product with
+  the origin removed is a different thing. The same warning now appears **in the
+  setup form**, which is where the decision actually gets made, in all three
+  languages.
+
 - **`brand/` folder with the integration icon.** Devices and Services was showing
   "icon not available" in place of it. Home Assistant 2026.3 and newer serve
   these local files through `/api/brands/`, so the integration no longer depends
-  on being listed in the `home-assistant/brands` repository. The mark is a circle
-  split down the middle, light on one side and dark on the other, which is the
-  usual shorthand for the light and dark theme this integration exists to follow.
+  on being listed in the `home-assistant/brands` repository. A painter's palette,
+  matching the emoji the README already used. Not the Home Assistant house, on
+  purpose: that one is theirs.
 
 ### 🔧 Changed
 
