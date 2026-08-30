@@ -1,14 +1,19 @@
 {
   "domain": "custom_branding",
   "name": "Custom Branding",
-  "version": "2026.8.1",
-  "integration_type": "service",
+  "codeowners": [
+    "@cateim"
+  ],
   "config_flow": true,
-  "single_config_entry": true,
-  "iot_class": "calculated",
-  "dependencies": ["frontend", "http"],
-  "codeowners": ["@cateim"],
+  "dependencies": [
+    "frontend",
+    "http"
+  ],
   "documentation": "https://github.com/self-labs/ha-custom-branding",
+  "integration_type": "service",
+  "iot_class": "calculated",
   "issue_tracker": "https://github.com/self-labs/ha-custom-branding/issues",
-  "requirements": []
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "2026.8.1"
 }
