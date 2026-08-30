@@ -1,0 +1,65 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Custom Branding",
+        "description": "Put your icons in a folder inside the Home Assistant configuration directory (for example {default_dir}, which becomes /config/{default_dir}). File names must match the ones Home Assistant uses: favicon.ico, favicon-192x192.png, favicon-512x512.png, maskable_icon-512x512.png, logo-loading.svg, and so on. See the README for the full list.",
+        "data": {
+          "brand_name": "Brand name",
+          "assets_dir": "Asset folder",
+          "patch_html": "Rewrite the login page title"
+        },
+        "data_description": {
+          "brand_name": "Replaces \"Home Assistant\" in the browser tab and in the name of the installed app.",
+          "assets_dir": "Path relative to the configuration directory. Keep it outside custom_components, which HACS replaces on every update.",
+          "patch_html": "Off by default. The login and onboarding pages have no extension point, so their title can only be changed by rewriting files inside the frontend package. The integration keeps a backup and reapplies the change on every start, so it survives an image update."
+        }
+      }
+    },
+    "error": {
+      "empty_name": "The brand name cannot be empty.",
+      "empty_dir": "The asset folder cannot be empty.",
+      "unsafe_dir": "The path cannot contain \"..\".",
+      "dir_not_found": "Folder not found inside the configuration directory.",
+      "no_assets": "No recognised file in that folder. File names must match the ones Home Assistant uses, such as favicon.ico or favicon-512x512.png."
+    },
+    "abort": {
+      "single_instance_allowed": "Custom Branding is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Custom Branding",
+        "description": "Changing anything here reloads the integration. Replacing an icon on disk with the same file name only needs the custom_branding.apply action.",
+        "data": {
+          "brand_name": "Brand name",
+          "assets_dir": "Asset folder",
+          "patch_html": "Rewrite the login page title"
+        },
+        "data_description": {
+          "brand_name": "Replaces \"Home Assistant\" in the browser tab and in the name of the installed app.",
+          "assets_dir": "Path relative to the configuration directory.",
+          "patch_html": "Turning this off restores the original pages."
+        }
+      }
+    },
+    "error": {
+      "empty_name": "The brand name cannot be empty.",
+      "empty_dir": "The asset folder cannot be empty.",
+      "unsafe_dir": "The path cannot contain \"..\".",
+      "dir_not_found": "Folder not found inside the configuration directory.",
+      "no_assets": "No recognised file in that folder."
+    }
+  },
+  "services": {
+    "apply": {
+      "name": "Apply branding",
+      "description": "Re-read the asset folder and apply the branding again."
+    },
+    "restore": {
+      "name": "Restore original pages",
+      "description": "Undo the login and onboarding page rewrite."
+    }
+  }
+}

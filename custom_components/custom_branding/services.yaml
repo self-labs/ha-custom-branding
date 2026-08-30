@@ -1,0 +1,14 @@
+apply:
+  name: Apply branding
+  description: >-
+    Re-read the asset folder and apply the branding again. Use this after
+    replacing an icon on disk, so you do not have to restart Home Assistant.
+    Note that routes registered on a previous start are not re-registered:
+    adding a brand new file still needs a restart.
+
+restore:
+  name: Restore original pages
+  description: >-
+    Undo the login and onboarding page rewrite, putting the original Home
+    Assistant files back from the backups taken before patching. Only relevant
+    when "Rewrite the login page title" is on.

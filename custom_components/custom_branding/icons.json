@@ -1,0 +1,6 @@
+{
+  "services": {
+    "apply": { "service": "mdi:palette-swatch" },
+    "restore": { "service": "mdi:backup-restore" }
+  }
+}

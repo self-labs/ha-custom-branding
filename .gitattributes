@@ -1,0 +1,15 @@
+# Normaliza fim de linha no repositório: LF no que é armazenado.
+* text=auto
+
+# Consumidos por Linux dentro do container do Home Assistant: precisam de LF
+# mesmo em checkout no Windows.
+*.py    text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.sh    text eol=lf
+
+# Binários, nunca converter.
+*.png   binary
+*.ico   binary

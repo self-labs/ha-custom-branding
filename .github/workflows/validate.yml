@@ -1,0 +1,40 @@
+name: Validate
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  hassfest:
+    name: Hassfest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run hassfest
+        uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    name: HACS
+    runs-on: ubuntu-latest
+    steps:
+      # Sem checkout de proposito: a action le o repositorio pela API do GitHub.
+      - name: Run HACS validation
+        uses: hacs/action@main
+        with:
+          category: integration
+          # Remova esta linha depois de adicionar custom_components/custom_branding/brand/icon.png.
+          # Ela e uma chave ATIVA, nao um comentario: sem ela o check "brands" reprova.
+          ignore: brands

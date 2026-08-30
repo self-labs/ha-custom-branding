@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Ferramentas
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+graphify-out/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Ambiente
+.env
+!.env.example
