@@ -53,6 +53,24 @@ ASSET_ROUTES: Final[dict[str, str]] = {
     "footer-dark.svg": "/static/images/open-home-foundation-on-dark.svg",
 }
 
+# Files that take over the route of another asset when present, overriding the
+# entry above for that URL.
+#
+# The login and onboarding screens render `favicon-192x192.png` as a 56x56
+# `img`, on a background that is #fafafa in the light theme and #111111 in the
+# dark one. A PNG cannot follow that: a light glyph disappears on one, a dark
+# glyph on the other, and an opaque background becomes a bright square floating
+# in the dark theme.
+#
+# An SVG can, through `@media (prefers-color-scheme: dark)` inside the file.
+# aiohttp picks the Content-Type from the file ON DISK, not from the URL, so an
+# SVG served at the .png route arrives as image/svg+xml and the browser renders
+# it as SVG. The manifest keeps pointing at the real PNG through ASSETS_URL,
+# because a PWA icon has to be a bitmap.
+ASSET_OVERRIDES: Final[dict[str, str]] = {
+    "login-icon.svg": "/static/icons/favicon-192x192.png",
+}
+
 # The manifest ships 4 "any" icons and 7 "maskable" ones. add_manifest_json_key
 # replaces the whole array, so both groups have to be rebuilt together or the
 # adaptive icon disappears on Android.

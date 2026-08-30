@@ -69,6 +69,7 @@ config/custom_branding/
 ├── favicon-1024x1024.png          # PWA
 ├── favicon-apple-180x180.png      # iOS home screen, opaque background
 ├── mask-icon.svg                  # Safari pinned tab, monochrome SVG
+├── login-icon.svg                 # OPTIONAL, takes over the login screen slot
 ├── maskable_icon-48x48.png        # Android adaptive icon
 ├── maskable_icon-72x72.png
 ├── maskable_icon-96x96.png
@@ -82,6 +83,34 @@ config/custom_branding/
 ```
 
 The bare minimum that looks finished: `favicon.ico`, `favicon-192x192.png`, `favicon-512x512.png`, `maskable_icon-512x512.png` and `logo-loading.svg`.
+
+### Following the light and dark theme
+
+Three of these are drawn straight onto the Home Assistant background, which is `#fafafa` in the light theme and `#111111` in the dark one. No single colour clears 3:1 against both, so a fixed-colour asset is guaranteed to look wrong in one of them, and an opaque background turns into a bright square floating in the dark theme.
+
+**An SVG can follow the theme**, because a browser applies the CSS inside an SVG loaded through `img`, media queries included:
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <style><![CDATA[
+    path { fill: #293a44; }
+    @media (prefers-color-scheme: dark) { path { fill: #e3e0d9; } }
+  ]]></style>
+  <path d="..."/>
+</svg>
+```
+
+The `CDATA` is not optional: an SVG served as `image/svg+xml` is parsed as strict XML, so a bare `<` or `&` anywhere in that CSS breaks the whole file.
+
+| Slot | Rendered at | Theme-aware how |
+| :--- | :--- | :--- |
+| Login and onboarding | 56x56 square | `login-icon.svg`, media query inside the file |
+| Loading screen | 96x96 square | `logo-loading.svg`, media query inside the file |
+| Footer | 237x24 | Two files: Home Assistant picks with `picture` + `prefers-color-scheme` |
+
+**`login-icon.svg` is the odd one.** That slot is a PNG in the frontend markup, and a PNG cannot carry a media query. aiohttp picks the `Content-Type` from the file on disk rather than from the URL, so when this file exists the integration serves it at `/static/icons/favicon-192x192.png` and the browser receives `image/svg+xml` and renders it as SVG. The PWA manifest keeps pointing at the real PNG, since an app icon has to be a bitmap.
+
+Both square slots are square: a wordmark dropped in there renders letterboxed and tiny (a 3:1 logo in a 96x96 box comes out 96x30). Use the compact mark for those two and the wordmark for the footer.
 
 Generating them from a square logo, with ImageMagick 7:
 

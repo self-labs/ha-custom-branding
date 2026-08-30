@@ -8,6 +8,24 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 
 ## [Unreleased]
 
+## [2026.8.4] - 2026-08-30
+
+### ✨ Added
+
+- **`login-icon.svg`, an optional asset that takes over the login screen slot.**
+  That slot is a PNG in the frontend markup and a PNG cannot carry a media
+  query, so a fixed-colour icon is wrong in one of the two themes and an opaque
+  background becomes a bright square floating in the dark theme. aiohttp picks
+  the `Content-Type` from the file on disk rather than from the URL, so an SVG
+  served at the `.png` route reaches the browser as `image/svg+xml` and renders
+  as SVG, media query and all. The PWA manifest keeps pointing at the real PNG,
+  since an app icon has to be a bitmap.
+- **README section on following the light and dark theme**, with the measured
+  reason it matters: the login and loading screens are drawn on `#fafafa` or
+  `#111111` depending on the theme, and no single colour clears 3:1 against
+  both. Also documents that the `CDATA` around the CSS is mandatory, because an
+  SVG served as `image/svg+xml` is parsed as strict XML.
+
 ## [2026.8.3] - 2026-08-30
 
 An adversarial review of the Python (four independent lenses, every finding
@@ -110,7 +128,8 @@ integration serves the wrong thing or leaves state behind.
 - Actions `custom_branding.apply` and `custom_branding.restore`.
 - CI with `hassfest` and `hacs/action`.
 
-[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.3...HEAD
+[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.4...HEAD
+[2026.8.4]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.3...v2026.8.4
 [2026.8.3]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.2...v2026.8.3
 [2026.8.2]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.1...v2026.8.2
 [2026.8.1]: https://github.com/self-labs/ha-custom-branding/releases/tag/v2026.8.1

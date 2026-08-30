@@ -37,6 +37,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from . import html_patch
 from .const import (
+    ASSET_OVERRIDES,
     ASSET_ROUTES,
     ASSETS_URL,
     CONF_ASSETS_DIR,
@@ -107,7 +108,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             f"there, then reload the integration."
         )
 
-    known = set(ASSET_ROUTES)
+    known = set(ASSET_ROUTES) | set(ASSET_OVERRIDES)
     usable = present & known
     if unknown := present - known:
         _LOGGER.debug("Ignoring %d unrecognised file(s): %s", len(unknown), unknown)
@@ -135,8 +136,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         ASSETS_URL: str(assets_dir),
         MODULE_URL: str(Path(__file__).parent / "frontend"),
     }
-    for filename in sorted(usable):
+    for filename in sorted(usable & set(ASSET_ROUTES)):
         wanted[ASSET_ROUTES[filename]] = str(assets_dir / filename)
+    # Applied last, so an override wins the URL over the plain asset.
+    for filename in sorted(usable & set(ASSET_OVERRIDES)):
+        url = ASSET_OVERRIDES[filename]
+        wanted[url] = str(assets_dir / filename)
+        _LOGGER.debug("%s takes over %s", filename, url)
 
     if stale := {
         url: registered[url]
