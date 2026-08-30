@@ -35,6 +35,3 @@ jobs:
         uses: hacs/action@main
         with:
           category: integration
-          # Remova esta linha depois de adicionar custom_components/custom_branding/brand/icon.png.
-          # Ela e uma chave ATIVA, nao um comentario: sem ela o check "brands" reprova.
-          ignore: brands

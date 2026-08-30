@@ -8,6 +8,22 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 
 ## [Unreleased]
 
+## [2026.8.5] - 2026-08-30
+
+### ✨ Added
+
+- **`brand/` folder with the integration icon.** Devices and Services was showing
+  "icon not available" in place of it. Home Assistant 2026.3 and newer serve
+  these local files through `/api/brands/`, so the integration no longer depends
+  on being listed in the `home-assistant/brands` repository. The mark is a circle
+  split down the middle, light on one side and dark on the other, which is the
+  usual shorthand for the light and dark theme this integration exists to follow.
+
+### 🔧 Changed
+
+- **CI now runs the `brands` check.** It was suppressed with `ignore: brands`
+  while there was no icon to check.
+
 ## [2026.8.4] - 2026-08-30
 
 ### ✨ Added
@@ -128,7 +144,8 @@ integration serves the wrong thing or leaves state behind.
 - Actions `custom_branding.apply` and `custom_branding.restore`.
 - CI with `hassfest` and `hacs/action`.
 
-[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.4...HEAD
+[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.5...HEAD
+[2026.8.5]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.4...v2026.8.5
 [2026.8.4]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.3...v2026.8.4
 [2026.8.3]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.2...v2026.8.3
 [2026.8.2]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.1...v2026.8.2
