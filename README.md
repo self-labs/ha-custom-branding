@@ -43,10 +43,21 @@ Only the last row touches anything inside the container, it is off by default, i
 
 ### HACS (recommended)
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=self-labs&repository=ha-custom-branding&category=integration)
+
+The button opens this repository straight in your HACS. Click **Download**, then restart Home Assistant.
+
+It works through [my.home-assistant.io](https://my.home-assistant.io/), which only knows how to reach your instance after you set your own URL there once, under **Settings → System → Network → Home Assistant URL**. Until then it asks for it.
+
+<details>
+<summary>Doing it by hand</summary>
+
 1. HACS → three-dot menu → **Custom repositories**.
 2. URL: `https://github.com/self-labs/ha-custom-branding`, type **Integration** → **ADD**.
 3. Open the entry and click **Download**.
 4. Restart Home Assistant.
+
+</details>
 
 ### Manual
 
@@ -180,6 +191,17 @@ Turning the option off, or calling `custom_branding.restore`, puts the originals
 
 > [!NOTE]
 > Adding a file that was **not** there when Home Assistant started still needs a restart: aiohttp has no public API to add a route after the fact without conflicts. Replacing a file that already exists takes effect immediately.
+
+## About the integration icon
+
+The `brand/` folder in this repository is served by Home Assistant 2026.3 and newer through `/api/brands/`, and is what puts the icon on **Settings → Devices & services**.
+
+**HACS does not use it.** The HACS panel resolves icons from its own CDN, fed by the [`home-assistant/brands`](https://github.com/home-assistant/brands) repository, so it shows "icon not available" until a PR adds `custom_integrations/custom_branding/` there. Clearing the browser cache will not change it, because nothing is being cached: the image genuinely does not exist at the address HACS asks for.
+
+| Surface                       | Icon source                 | Works today         |
+| :---------------------------- | :-------------------------- | :------------------ |
+| Settings → Devices & services | local `brand/` folder       | ✅                  |
+| HACS panel                    | `home-assistant/brands` CDN | ❌ needs a PR there |
 
 ## Trademark and responsible use
 
