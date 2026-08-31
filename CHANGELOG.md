@@ -24,7 +24,10 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
   from its own CDN, fed by the `home-assistant/brands` repository, and ignores
   the local folder entirely. Clearing the browser cache changes nothing there,
   because nothing is cached: the image genuinely does not exist at the address
-  HACS asks for.
+  HACS asks for. And there is no PR to submit either: since HA 2026.3 that
+  repository no longer accepts brand icons for custom integrations and closes
+  such PRs by bot. The gap is on the HACS side, tracked in
+  `hacs/integration#5171`, open since March 2026.
 
 ### 🐛 Fixed
 
@@ -57,9 +60,10 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 
   **It does not fix the HACS panel.** HACS resolves icons from its own CDN, fed
   by the `home-assistant/brands` repository, and ignores the local `brand/`
-  folder entirely. Until a PR adds `custom_integrations/custom_branding/` there,
-  HACS keeps showing "icon not available", and no amount of cache clearing
-  changes that.
+  folder entirely, so HACS keeps showing "icon not available" and no amount of
+  cache clearing changes that. (Corrected in 2026.8.6: an earlier draft of this
+  entry said a PR to `home-assistant/brands` would fix it. That repository stopped
+  accepting custom integration icons in HA 2026.3.)
 
   A painter's palette, matching the emoji the README already used. Not the Home
   Assistant house, on purpose: that one is theirs.

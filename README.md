@@ -196,12 +196,14 @@ Turning the option off, or calling `custom_branding.restore`, puts the originals
 
 The `brand/` folder in this repository is served by Home Assistant 2026.3 and newer through `/api/brands/`, and is what puts the icon on **Settings → Devices & services**.
 
-**HACS does not use it.** The HACS panel resolves icons from its own CDN, fed by the [`home-assistant/brands`](https://github.com/home-assistant/brands) repository, so it shows "icon not available" until a PR adds `custom_integrations/custom_branding/` there. Clearing the browser cache will not change it, because nothing is being cached: the image genuinely does not exist at the address HACS asks for.
+**HACS does not use it.** The HACS panel resolves icons from its own CDN, fed by the [`home-assistant/brands`](https://github.com/home-assistant/brands) repository, and ignores the local folder, so it shows "icon not available". Clearing the browser cache will not change it, because nothing is being cached: the image genuinely does not exist at the address HACS asks for.
 
-| Surface                       | Icon source                 | Works today         |
-| :---------------------------- | :-------------------------- | :------------------ |
-| Settings → Devices & services | local `brand/` folder       | ✅                  |
-| HACS panel                    | `home-assistant/brands` CDN | ❌ needs a PR there |
+**And there is nothing to submit.** Since HA 2026.3, `home-assistant/brands` **no longer accepts** brand icons for custom integrations: those PRs get closed by a bot pointing at the [brands proxy announcement](https://developers.home-assistant.io/blog/2026/02/24/brands-proxy-api), whose whole point is the local `brand/` folder this repository already ships. The gap is on the HACS side, tracked in [`hacs/integration#5171`](https://github.com/hacs/integration/issues/5171), open since March 2026 and affecting every custom integration that followed the official guidance.
+
+| Surface                       | Icon source           | Works today     |
+| :---------------------------- | :-------------------- | :-------------- |
+| Settings → Devices & services | local `brand/` folder | ✅              |
+| HACS panel                    | HACS's own CDN        | ❌ upstream gap |
 
 ## Trademark and responsible use
 
