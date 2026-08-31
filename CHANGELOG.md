@@ -8,6 +8,31 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 
 ## [Unreleased]
 
+## [2026.8.6] - 2026-08-31
+
+### ✨ Added
+
+- **One-click install button** in the README, through
+  [my.home-assistant.io](https://my.home-assistant.io/). It uses the
+  `hacs_repository` redirect, which is the one that opens a custom repository
+  inside HACS; the `supervisor_add_addon_repository` redirect that shows up in
+  some READMEs is for Supervisor add-ons and does nothing on a plain Docker
+  install. The manual steps moved into a collapsed block.
+- **Section explaining where the integration icon does and does not show up.**
+  The `brand/` folder covers Settings > Devices & services, served through
+  `/api/brands/`. It does **not** cover the HACS panel, which resolves icons
+  from its own CDN, fed by the `home-assistant/brands` repository, and ignores
+  the local folder entirely. Clearing the browser cache changes nothing there,
+  because nothing is cached: the image genuinely does not exist at the address
+  HACS asks for.
+
+### 🐛 Fixed
+
+- **The 2026.8.5 entry claimed the integration "no longer depends on being
+  listed in the `home-assistant/brands` repository".** True for Devices &
+  Services, false for the HACS panel, and the sentence sent at least one person
+  looking for the icon in the wrong screen. Corrected in place.
+
 ## [2026.8.5] - 2026-08-30
 
 ### ✨ Added
@@ -28,10 +53,16 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 
 - **`brand/` folder with the integration icon.** Devices and Services was showing
   "icon not available" in place of it. Home Assistant 2026.3 and newer serve
-  these local files through `/api/brands/`, so the integration no longer depends
-  on being listed in the `home-assistant/brands` repository. A painter's palette,
-  matching the emoji the README already used. Not the Home Assistant house, on
-  purpose: that one is theirs.
+  these local files through `/api/brands/`, which is what fixes that screen.
+
+  **It does not fix the HACS panel.** HACS resolves icons from its own CDN, fed
+  by the `home-assistant/brands` repository, and ignores the local `brand/`
+  folder entirely. Until a PR adds `custom_integrations/custom_branding/` there,
+  HACS keeps showing "icon not available", and no amount of cache clearing
+  changes that.
+
+  A painter's palette, matching the emoji the README already used. Not the Home
+  Assistant house, on purpose: that one is theirs.
 
 ### 🔧 Changed
 
@@ -158,7 +189,8 @@ integration serves the wrong thing or leaves state behind.
 - Actions `custom_branding.apply` and `custom_branding.restore`.
 - CI with `hassfest` and `hacs/action`.
 
-[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.5...HEAD
+[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.6...HEAD
+[2026.8.6]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.5...v2026.8.6
 [2026.8.5]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.4...v2026.8.5
 [2026.8.4]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.3...v2026.8.4
 [2026.8.3]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.2...v2026.8.3
