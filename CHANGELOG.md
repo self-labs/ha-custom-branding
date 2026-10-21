@@ -8,6 +8,13 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 
 ## [Unreleased]
 
+## [2026.10.2] - 2026-10-21
+
+### ✨ Added
+
+- **One-click setup button** in the README, next to the HACS one: it opens **Add integration** on Custom Branding through [my.home-assistant.io](https://my.home-assistant.io/), as the other Self-Labs integrations already do.
+- **A Release badge** at the top of the README with the current version, as on the other Self-Labs projects.
+
 ## [2026.10.1] - 2026-10-21
 
 ### 🐛 Fixed
@@ -199,7 +206,8 @@ integration serves the wrong thing or leaves state behind.
 - Actions `custom_branding.apply` and `custom_branding.restore`.
 - CI with `hassfest` and `hacs/action`.
 
-[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.10.1...HEAD
+[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.10.2...HEAD
+[2026.10.2]: https://github.com/self-labs/ha-custom-branding/compare/v2026.10.1...v2026.10.2
 [2026.10.1]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.6...v2026.10.1
 [2026.8.6]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.5...v2026.8.6
 [2026.8.5]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.4...v2026.8.5

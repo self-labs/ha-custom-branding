@@ -1,4 +1,4 @@
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5?logo=home-assistant&logoColor=white)](https://hacs.xyz/) [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.12%2B-41BDF5?logo=home-assistant&logoColor=white)](https://www.home-assistant.io/) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/self-labs/ha-custom-branding/blob/master/LICENSE)
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5?logo=home-assistant&logoColor=white)](https://hacs.xyz/) [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.12%2B-41BDF5?logo=home-assistant&logoColor=white)](https://www.home-assistant.io/) [![Release](https://img.shields.io/github/v/release/self-labs/ha-custom-branding?color=293a44)](https://github.com/self-labs/ha-custom-branding/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/self-labs/ha-custom-branding/blob/master/LICENSE)
 
 <!-- Every link on the line above stays absolute. HACS rewrites a relative link by
 prefixing the first "(" of the whole line, which was the first badge's image. -->
@@ -150,7 +150,9 @@ done
 
 ### 2. Add the integration
 
-**Settings → Devices & services → Add integration → Custom Branding**, then fill in:
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=custom_branding)
+
+Or **Settings → Devices & services → Add integration → Custom Branding**. Then fill in:
 
 | Field                            | Meaning                                                                  |
 | :------------------------------- | :----------------------------------------------------------------------- |
