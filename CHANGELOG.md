@@ -8,6 +8,12 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 
 ## [Unreleased]
 
+## [2026.10.1] - 2026-10-21
+
+### 🐛 Fixed
+
+- **The first README badge showed as a broken image inside HACS.** HACS rewrites a relative link by prefixing the first `(` of the line, and the badge line ended in `./LICENSE`, so the prefix landed on the first badge's image. The licence badge now links with an absolute URL.
+
 ## [2026.8.6] - 2026-08-31
 
 ### ✨ Added
@@ -193,7 +199,8 @@ integration serves the wrong thing or leaves state behind.
 - Actions `custom_branding.apply` and `custom_branding.restore`.
 - CI with `hassfest` and `hacs/action`.
 
-[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.6...HEAD
+[Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.10.1...HEAD
+[2026.10.1]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.6...v2026.10.1
 [2026.8.6]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.5...v2026.8.6
 [2026.8.5]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.4...v2026.8.5
 [2026.8.4]: https://github.com/self-labs/ha-custom-branding/compare/v2026.8.3...v2026.8.4
