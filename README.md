@@ -1,4 +1,4 @@
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5?logo=home-assistant&logoColor=white)](https://hacs.xyz/) [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.12%2B-41BDF5?logo=home-assistant&logoColor=white)](https://www.home-assistant.io/) [![Release](https://img.shields.io/github/v/release/self-labs/ha-custom-branding?color=293a44)](https://github.com/self-labs/ha-custom-branding/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/self-labs/ha-custom-branding/blob/master/LICENSE)
+[![Marketplace Custom](https://img.shields.io/badge/Marketplace-Custom-41BDF5?logo=home-assistant&logoColor=white)](https://www.home-assistant.io/integrations/marketplace) [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.12%2B-41BDF5?logo=home-assistant&logoColor=white)](https://www.home-assistant.io/) [![Release](https://img.shields.io/github/v/release/self-labs/ha-custom-branding?color=293a44)](https://github.com/self-labs/ha-custom-branding/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/self-labs/ha-custom-branding/blob/master/LICENSE)
 
 <!-- Every link on the line above stays absolute. HACS rewrites a relative link by
 prefixing the first "(" of the whole line, which was the first badge's image. -->
@@ -44,21 +44,23 @@ Only the last row touches anything inside the container, it is off by default, i
 
 ## Install
 
-### HACS (recommended)
+### Marketplace (recommended)
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=self-labs&repository=ha-custom-branding&category=integration)
+[![Open your Home Assistant instance and open this repository in the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=self-labs&repository=ha-custom-branding&category=integration)
 
-The button opens this repository straight in your HACS. Click **Download**, then restart Home Assistant.
+The button opens this repository straight in the Marketplace, which Home Assistant ships under **Settings → Marketplace** since 2026.11 (it replaced HACS; on an older Home Assistant the same button opens HACS, where the button is **Download**). Click **Install**, then restart Home Assistant. Adding a repository from a link needs GitHub connected to the Marketplace; it asks for that the first time.
 
 It works through [my.home-assistant.io](https://my.home-assistant.io/), which only knows how to reach your instance after you set your own URL there once, under **Settings → System → Network → Home Assistant URL**. Until then it asks for it.
 
 <details>
 <summary>Doing it by hand</summary>
 
-1. HACS → three-dot menu → **Custom repositories**.
-2. URL: `https://github.com/self-labs/ha-custom-branding`, type **Integration** → **ADD**.
-3. Open the entry and click **Download**.
+1. **Settings → Marketplace → Add from link** (top right).
+2. **GitHub link**: `https://github.com/self-labs/ha-custom-branding` → **Add**.
+3. Open the entry and click **Install**.
 4. Restart Home Assistant.
+
+On Home Assistant older than 2026.11: HACS → three-dot menu → **Custom repositories**, URL `https://github.com/self-labs/ha-custom-branding`, type **Integration** → **ADD**, then **Download** and restart.
 
 </details>
 
@@ -201,14 +203,15 @@ Turning the option off, or calling `custom_branding.restore`, puts the originals
 
 The `brand/` folder in this repository is served by Home Assistant 2026.3 and newer through `/api/brands/`, and is what puts the icon on **Settings → Devices & services**.
 
-**HACS does not use it.** The HACS panel resolves icons from its own CDN, fed by the [`home-assistant/brands`](https://github.com/home-assistant/brands) repository, and ignores the local folder, so it shows "icon not available". Clearing the browser cache will not change it, because nothing is being cached: the image genuinely does not exist at the address HACS asks for.
+**The Marketplace shows it too** (Home Assistant 2026.11, checked on 2026-11-12). **HACS did not use it.** The HACS panel resolved icons from its own CDN, fed by the [`home-assistant/brands`](https://github.com/home-assistant/brands) repository, and ignored the local folder, so it showed "icon not available". Clearing the browser cache did not change it, because nothing was being cached: the image genuinely did not exist at the address HACS asked for.
 
-**And there is nothing to submit.** Since HA 2026.3, `home-assistant/brands` **no longer accepts** brand icons for custom integrations: those PRs get closed by a bot pointing at the [brands proxy announcement](https://developers.home-assistant.io/blog/2026/02/24/brands-proxy-api), whose whole point is the local `brand/` folder this repository already ships. The gap is on the HACS side, tracked in [`hacs/integration#5171`](https://github.com/hacs/integration/issues/5171), open since March 2026 and affecting every custom integration that followed the official guidance.
+**And there was nothing to submit.** Since HA 2026.3, `home-assistant/brands` **no longer accepts** brand icons for custom integrations: those PRs get closed by a bot pointing at the [brands proxy announcement](https://developers.home-assistant.io/blog/2026/02/24/brands-proxy-api), whose whole point is the local `brand/` folder this repository already ships. The gap was on the HACS side, tracked in [`hacs/integration#5171`](https://github.com/hacs/integration/issues/5171), open since March 2026 and affecting every custom integration that followed the official guidance.
 
 | Surface                       | Icon source           | Works today     |
 | :---------------------------- | :-------------------- | :-------------- |
 | Settings → Devices & services | local `brand/` folder | ✅              |
-| HACS panel                    | HACS's own CDN        | ❌ upstream gap |
+| Marketplace (HA 2026.11)      | local `brand/` folder | ✅              |
+| HACS panel (before 2026.11)   | HACS's own CDN        | ❌ upstream gap |
 
 ## Trademark and responsible use
 

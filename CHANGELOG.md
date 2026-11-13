@@ -8,6 +8,13 @@ Versions follow **CalVer `YYYY.M.R`** (year, month with no leading zero, revisio
 
 ## [Unreleased]
 
+### 🔧 Changed
+
+- **The README installs through the Marketplace**, which replaced HACS in Home Assistant 2026.11:
+  **Settings → Marketplace → Add from link** by hand, **Install** on the repository, and the HACS
+  steps kept for an older Home Assistant. The icon section now says the Marketplace shows the
+  integration icon from the local `brand/` folder, which the HACS panel never did.
+
 ## [2026.10.2] - 2026-10-21
 
 ### ✨ Added
@@ -205,6 +212,17 @@ integration serves the wrong thing or leaves state behind.
   update does not undo it.
 - Actions `custom_branding.apply` and `custom_branding.restore`.
 - CI with `hassfest` and `hacs/action`.
+
+## Legend
+
+| Type          | Meaning                                 |
+| ------------- | --------------------------------------- |
+| ✨ Added      | new features                            |
+| 🔧 Changed    | changes in existing functionality       |
+| ⚠️ Deprecated | features that will be removed soon      |
+| 🗑️ Removed    | features removed in this release        |
+| 🐛 Fixed      | bug fixes                               |
+| 🔐 Security   | vulnerabilities addressed and hardening |
 
 [Unreleased]: https://github.com/self-labs/ha-custom-branding/compare/v2026.10.2...HEAD
 [2026.10.2]: https://github.com/self-labs/ha-custom-branding/compare/v2026.10.1...v2026.10.2

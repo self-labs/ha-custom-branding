@@ -1,7 +1,8 @@
 # Custom Branding: Repository Conventions (for AI agents)
 
-A Home Assistant **custom integration**, distributed through HACS, that replaces the Home Assistant
-artwork and product name on an installation with the operator's own.
+A Home Assistant **custom integration**, distributed through the Marketplace (HACS before Home
+Assistant 2026.11), that replaces the Home Assistant artwork and product name on an installation
+with the operator's own.
 
 This is real Python that runs inside someone's home server. Unlike a documentation repo, a mistake
 here breaks a live instance, so correctness and reversibility come before feature count.
